@@ -5,9 +5,12 @@
 *Date: 19/04/22
 *
 */
+
 // dependencies 
 const http = require('http');
 
+
+const {handleReqRes} = require('./helpers/handleReqRes')
 // app object - mudule scaffolding 
 const app = {};
 
@@ -19,15 +22,12 @@ app.config = {
 // create server 
 app.createServer = () => {
     const server = http.createServer(app.handleReqRes);
-    server.listen(app.config.port,()=>{
+    server.listen(app.config.port, () => {
         console.log(`Listening to port ${app.config.port}`)
     })
 }
 
 // handle Request and Response 
-app.handleReqRes = (req,res) => {
-    // response handle 
-    res.end('Hello Coders')
-}
+app.handleReqRes = handleReqRes;
 
 app.createServer();
