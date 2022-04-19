@@ -8,22 +8,25 @@
 
 // dependencies 
 const http = require('http');
-
+const environment = require('./helpers/environments');
+const data = require('./lib/data');
 
 const {handleReqRes} = require('./helpers/handleReqRes')
 // app object - mudule scaffolding 
 const app = {};
 
-// configuration object 
-app.config = {
-    port: 3000
-};
+// testing file system 
+// TODO: erase later
+data.read('test','newFile', (err,result)=>{
+    console.log(`error was`, err);
+    console.log('Data', result)
+})
 
 // create server 
 app.createServer = () => {
     const server = http.createServer(app.handleReqRes);
-    server.listen(app.config.port, () => {
-        console.log(`Listening to port ${app.config.port}`)
+    server.listen(environment.port, () => {
+        console.log(`Listening to port ${environment.port}`)
     })
 }
 
