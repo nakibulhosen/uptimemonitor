@@ -11,15 +11,14 @@ const http = require('http');
 const environment = require('./helpers/environments');
 const data = require('./lib/data');
 
-const {handleReqRes} = require('./helpers/handleReqRes')
+const { handleReqRes } = require('./helpers/handleReqRes')
 // app object - mudule scaffolding 
 const app = {};
 
 // testing file system 
 // TODO: erase later
-data.read('test','newFile', (err,result)=>{
-    console.log(`error was`, err);
-    console.log('Data', result)
+data.delete('test', 'newFile',(err) => {
+    console.log('Error', err);
 })
 
 // create server 
