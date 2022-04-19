@@ -15,12 +15,6 @@ const { handleReqRes } = require('./helpers/handleReqRes')
 // app object - mudule scaffolding 
 const app = {};
 
-// testing file system 
-// TODO: erase later
-data.delete('test', 'newFile',(err) => {
-    console.log('Error', err);
-})
-
 // create server 
 app.createServer = () => {
     const server = http.createServer(app.handleReqRes);
