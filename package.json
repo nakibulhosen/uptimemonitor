@@ -1,0 +1,16 @@
+{
+  "name": "rawnodeproject",
+  "version": "1.0.0",
+  "description": "Practice ndoe js",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Md Nakibul Hosen Nahid",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
