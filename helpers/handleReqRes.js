@@ -36,29 +36,28 @@ handler.handleReqRes = (req, res) => {
         headersObject
     }
 
-    choosenHandler(requestProperties, (statusCode, payload) => {
-        statusCode = typeof (statusCode) === 'number' ? statusCode : 500;
-        payload = typeof (payload) === 'object' ? payload : {}
 
-        const payloadString = JSON.stringify(payload);
 
-        // return the final response 
-        res.writeHead(statusCode);
-        res.end(payloadString);
+    const decoder = new StringDecoder('utf-8')
+    let realData = '';
+
+    req.on('data', (buffer) => {
+        realData += decoder.write(buffer)
     })
+    req.on('end', () => {
+        realData += decoder.end();
+        
+        choosenHandler(requestProperties, (statusCode, payload) => {
+            statusCode = typeof (statusCode) === 'number' ? statusCode : 500;
+            payload = typeof (payload) === 'object' ? payload : {}
 
-    // const decoder = new StringDecoder('utf-8')
-    // let realData = '';
+            const payloadString = JSON.stringify(payload);
 
-    // req.on('data', (buffer) => {
-    //     realData += decoder.write(buffer)
-    // })
-    // req.on('end', () => {
-    //     realData += decoder.end();
-    //     console.log(realData)
-    //     // response handle 
-    //    res.end('Hello world')
-    // })
+            // return the final response 
+            res.writeHead(statusCode);
+            res.end(payloadString);
+        });
+    })
 
 }
 module.exports = handler
