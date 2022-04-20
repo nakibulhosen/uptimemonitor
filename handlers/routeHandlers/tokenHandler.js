@@ -84,7 +84,26 @@ handler._token.post = (requestProperties, callback) => {
     }
 }
 handler._token.get = (requestProperties, callback) => {
+    // check the phone number is valid or not 
+    const id = typeof (requestProperties.queryStringObject.id) === 'string' && requestProperties.queryStringObject.id.trim().length === 20 ? requestProperties.queryStringObject.id : false;
 
+    if (id) {
+        data.read('tokens', id, (err, utoken) => {
+            const token = { ...parseJSON(utoken) }
+            if (!err && token) {
+                callback(200, token)
+            } else {
+                callback(404, {
+                    'message': 'Requested token does not exist'
+                })
+            }
+        })
+    } else {
+        callback(400, {
+            'message': 'Enter valid token id',
+
+        })
+    }
 }
 handler._token.put = (requestProperties, callback) => {
 
