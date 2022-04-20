@@ -152,10 +152,93 @@ handler._check.get = (requestProperties, callback) => {
     }
 }
 handler._check.put = (requestProperties, callback) => {
+    const id = typeof (requestProperties.queryStringObject.id) === 'string' && requestProperties.queryStringObject.id.trim().length === 20 ? requestProperties.queryStringObject.id : false;
 
+    // Input validation 
+    let protocol = typeof (requestProperties.body.protocol) === 'string' && ['http', 'https'].indexOf(requestProperties.body.protocol) > -1 ? requestProperties.body.protocol : false;
+
+    let url = typeof (requestProperties.body.url) === 'string' && requestProperties.body.url.trim().length > 0 ? requestProperties.body.url : false;
+
+    let method = typeof (requestProperties.body.method) === 'string' && ['get', 'post', 'put', 'delete'].indexOf(requestProperties.body.method.toLowerCase()) > -1 ? requestProperties.body.method : false;
+
+    let successCodes = typeof (requestProperties.body.successCodes) === 'object' && requestProperties.body.successCodes instanceof Array ? requestProperties.body.successCodes : false;
+
+    let timeoutSeconds = typeof (requestProperties.body.timeoutSeconds) === 'number' && requestProperties.body.timeoutSeconds % 1 === 0 && requestProperties.body.timeoutSeconds > 1 && requestProperties.body.timeoutSeconds <= 5 ? requestProperties.body.timeoutSeconds : false;
+
+    if (id) {
+        if (protocol || method || url || successCodes || timeoutSeconds) {
+            data.read('checks', id, (err1, checkData) => {
+                if (!err1 && checkData) {
+                    const checkObject = parseJSON(checkData)
+                    // validate token 
+                    const token = typeof (requestProperties.headersObject.token) === 'string' && requestProperties.headersObject.token.trim().length === 20 ? requestProperties.headersObject.token : false;
+                    // verify token 
+                    if (token) {
+                        tokenHandler._token.verify(token, checkObject.userPhone, (IsTokenValid) => {
+                            if (IsTokenValid) {
+                                if (protocol) {
+                                    checkObject.protocol = protocol;
+                                }
+                                if (method) {
+                                    checkObject.method = method
+                                }
+                                if (url) {
+                                    checkObject.url = url
+                                }
+                                if (successCodes) {
+                                    checkObject.successCodes = successCodes
+                                }
+                                if (timeoutSeconds) {
+                                    checkObject.timeoutSeconds = timeoutSeconds
+                                }
+
+                                // store the check object 
+                                data.update('checks', id, checkObject, (err2) => {
+                                    if (!err2) {
+                                        callback(200, {
+                                            checkObject
+                                        })
+                                    } else {
+                                        callback(500, {
+                                            'message': 'There was a server side error',
+                                            err2
+                                        })
+                                    }
+                                })
+                            } else {
+                                callback(403, {
+                                    'message': 'Invalid authentication token. Please login again',
+                                })
+                            }
+                        })
+                    } else {
+                        callback(400, {
+                            'message': 'Invalid authentication token format. Please login again',
+                        })
+                    }
+                } else {
+                    callback(500, {
+                        'message': 'There was a server side error',
+                        err1
+                    })
+                }
+            })
+        } else {
+            callback(400, {
+                'message': 'You have to provide at least one field to update'
+            })
+        }
+    } else {
+        callback(400, {
+            'message': 'Invalid check id'
+        })
+    }
 }
 handler._check.delete = (requestProperties, callback) => {
+    const token = typeof (requestProperties.headersObject.token) === 'string' && requestProperties.headersObject.token.trim().length === 20 ? requestProperties.headersObject.token : false;
+    // tokenHandler._token.verify(token, parseJSON(checkData).userPhone, (IsTokenValid) => {
 
+    // }
 }
 
 module.exports = handler;
