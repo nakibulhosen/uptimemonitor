@@ -113,25 +113,32 @@ handler._token.put = (requestProperties, callback) => {
         data.read('tokens', id, (err, tokenData) => {
             const token = { ...parseJSON(tokenData) };
             if (!err && token) {
-                // increase token expire time 
-                token.expires = token.expires + (60 * 60 * 1000);
+                // Check if it expires or not 
+                if (token.expires > Date.now()) {
+                    // increase token expire time 
+                    token.expires = token.expires + (60 * 60 * 1000);
+                    // Store to database 
+                    data.update('tokens', id, token, (err) => {
+                        if (!err) {
+                            callback(200, {
+                                'message': 'Token updated successfully'
+                            })
+                        } else {
+                            callback(500, {
+                                'message': 'There was a problem in server side',
+                                'error': err
+                            })
+                        }
+                    })
+                } else {
+                    callback(400, {
+                        'message': 'Token already expired'
+                    })
+                }
 
-                // Store to database 
-                data.update('tokens', id, token, (err) => {
-                    if (!err) {
-                        callback(200, {
-                            'message': 'Token updated successfully'
-                        })
-                    } else {
-                        callback(500, {
-                            'message': 'There was a problem in server side',
-                            'error': err
-                        })
-                    }
-                })
             } else {
                 callback(404, {
-                    'message': 'User does not exist'
+                    'message': 'Token does not exist'
                 })
             }
         })
@@ -142,7 +149,34 @@ handler._token.put = (requestProperties, callback) => {
     }
 }
 handler._token.delete = (requestProperties, callback) => {
+    // check the token id is valid or not 
+    const id = typeof (requestProperties.queryStringObject.id) === 'string' && requestProperties.queryStringObject.id.trim().length === 20 ? requestProperties.queryStringObject.id : false;
 
+    if (id) {
+        data.read('tokens', id, (err, tokenData) => {
+            if (!err) {
+                data.delete('tokens', id, (err) => {
+                    if (!err) {
+                        callback(200, {
+                            'message': 'Token deleted successfully, User will be logged out'
+                        })
+                    } else {
+                        callback(500, {
+                            'message': 'There was a server side error'
+                        })
+                    }
+                })
+            } else {
+                callback(500, {
+                    'message': 'There was a server side error, The token may not exist',
+                })
+            }
+        })
+    } else {
+        callback(400, {
+            'message': 'Invalid Token id'
+        })
+    }
 }
 
 module.exports = handler;
