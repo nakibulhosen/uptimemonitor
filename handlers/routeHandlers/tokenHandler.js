@@ -39,7 +39,6 @@ handler._token.post = (requestProperties, callback) => {
             if (!err && uData) {
                 const userData = parseJSON(uData);
                 const hashPassword = hash(password);
-                console.log(hashPassword === userData.password, `hashPassword ${hashPassword} user pass ${userData.password}`)
                 if (hashPassword === userData.password) {
                     let tokenId = createRandomString(20);
                     let expires = Date.now() + 60 * 60 * 1000;
