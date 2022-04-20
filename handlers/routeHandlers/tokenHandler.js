@@ -84,7 +84,7 @@ handler._token.post = (requestProperties, callback) => {
     }
 }
 handler._token.get = (requestProperties, callback) => {
-    // check the phone number is valid or not 
+    // check the token id is valid or not 
     const id = typeof (requestProperties.queryStringObject.id) === 'string' && requestProperties.queryStringObject.id.trim().length === 20 ? requestProperties.queryStringObject.id : false;
 
     if (id) {
@@ -106,7 +106,40 @@ handler._token.get = (requestProperties, callback) => {
     }
 }
 handler._token.put = (requestProperties, callback) => {
+    // check the token id is valid or not 
+    const id = typeof (requestProperties.queryStringObject.id) === 'string' && requestProperties.queryStringObject.id.trim().length === 20 ? requestProperties.queryStringObject.id : false;
+    const extend = typeof (Boolean(requestProperties.queryStringObject.extend)) === 'boolean' && requestProperties.queryStringObject.extend.trim().length > 0 ? requestProperties.queryStringObject.extend : false;
+    if (id && extend) {
+        data.read('tokens', id, (err, tokenData) => {
+            const token = { ...parseJSON(tokenData) };
+            if (!err && token) {
+                // increase token expire time 
+                token.expires = token.expires + (60 * 60 * 1000);
 
+                // Store to database 
+                data.update('tokens', id, token, (err) => {
+                    if (!err) {
+                        callback(200, {
+                            'message': 'Token updated successfully'
+                        })
+                    } else {
+                        callback(500, {
+                            'message': 'There was a problem in server side',
+                            'error': err
+                        })
+                    }
+                })
+            } else {
+                callback(404, {
+                    'message': 'User does not exist'
+                })
+            }
+        })
+    } else {
+        callback(400, {
+            'message': 'Invalid token'
+        })
+    }
 }
 handler._token.delete = (requestProperties, callback) => {
 
