@@ -1,1 +1,1 @@
-{"id":"bjq8arq7fy2t8uuw8yra","userPhone":"01712345671","protocol":"https","url":"google.com","method":"get","successCodes":[200,201],"timeoutSeconds":2}
+{"id":"bjq8arq7fy2t8uuw8yra","userPhone":"01712345671","protocol":"http","url":"www.google.com","method":"get","successCodes":[200,201],"timeoutSeconds":2}
