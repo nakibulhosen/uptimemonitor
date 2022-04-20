@@ -124,7 +124,32 @@ handler._check.post = (requestProperties, callback) => {
 
 }
 handler._check.get = (requestProperties, callback) => {
-
+    const id = typeof (requestProperties.queryStringObject.id) === 'string' && requestProperties.queryStringObject.id.trim().length === 20 ? requestProperties.queryStringObject.id : false;
+    if (id) {
+        //lookup the check
+        data.read('checks', id, (err1, checkData) => {
+            if (!err1 && checkData) {
+                const token = typeof (requestProperties.headersObject.token) === 'string' ? requestProperties.headersObject.token : false;
+                tokenHandler._token.verify(token, parseJSON(checkData).userPhone, (IsTokenValid) => {
+                    if (IsTokenValid) {
+                        callback(200, parseJSON(checkData))
+                    } else {
+                        callback(403, {
+                            'message': 'Invalid authentication token'
+                        })
+                    }
+                })
+            } else {
+                callback(500, {
+                    'message': 'There was a server side error, May be the checks are not exist'
+                })
+            }
+        })
+    } else {
+        callback(400, {
+            'message': 'Ivalid data format'
+        })
+    }
 }
 handler._check.put = (requestProperties, callback) => {
 
