@@ -16,14 +16,24 @@ environments.staging = {
     port: 3000,
     envName: 'staging',
     secretKey: 'ILoveNodeJS',
-    maxChecks: 5
+    maxChecks: 5,
+    twilio: {
+        from: '+150055006',
+        accountSid: 'ACb32d411ad7fe886aac54c665ed25e5c5d',
+        authToken: '9455db3109edc12ee3d8c92768f7a67'
+    }
 }
 
 environments.production = {
     port: 5000,
     envName: 'production',
     secretKey: 'ILoveNodeJS',
-    maxChecks: 5
+    maxChecks: 5,
+    twilio: {
+        from: '+150055006',
+        accountSid: 'ACb32d411ad7fe886aac54c665ed25e5c5d',
+        authToken: '9455db3109edc12ee3d8c92768f7a67'
+    }
 }
 
 // determine which environment was passed 
