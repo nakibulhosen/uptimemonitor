@@ -235,10 +235,74 @@ handler._check.put = (requestProperties, callback) => {
     }
 }
 handler._check.delete = (requestProperties, callback) => {
-    const token = typeof (requestProperties.headersObject.token) === 'string' && requestProperties.headersObject.token.trim().length === 20 ? requestProperties.headersObject.token : false;
-    // tokenHandler._token.verify(token, parseJSON(checkData).userPhone, (IsTokenValid) => {
+    const id = typeof (requestProperties.queryStringObject.id) === 'string' && requestProperties.queryStringObject.id.trim().length === 20 ? requestProperties.queryStringObject.id : false;
+    if (id) {
+        //lookup the check
+        data.read('checks', id, (err1, checkData) => {
+            if (!err1 && checkData) {
+                const token = typeof (requestProperties.headersObject.token) === 'string' ? requestProperties.headersObject.token : false;
+                tokenHandler._token.verify(token, parseJSON(checkData).userPhone, (IsTokenValid) => {
+                    if (IsTokenValid) {
+                        data.delete('checks', id, (err2) => {
+                            if (!err2) {
+                                data.read('users', parseJSON(checkData).userPhone, (err3, userData) => {
+                                    if (!err3 && userData) {
+                                        let userObject = parseJSON(userData)
+                                        let userChecks = typeof (userObject.checks) === 'object' && userObject.checks instanceof Array ? userObject.checks : [];
 
-    // }
+                                        // remove the deleted check id from user's list of check 
+                                        let checkPosition = userChecks.indexOf(id);
+                                        if (checkPosition > -1) {
+                                            userChecks.splice(checkPosition, 1);
+
+                                            // resave the user data 
+                                            userObject.checks = userChecks;
+
+                                            data.update('users', userObject.phone, userObject, (err4) => {
+                                                if (!err4) {
+                                                    callback(200, {
+                                                        'message': 'Check deleted successfully'
+                                                    })
+                                                } else {
+                                                    callback(500, {
+                                                        'message': 'There was a server side error while updating user checks'
+                                                    })
+                                                }
+                                            })
+                                        } else {
+                                            callback(500, {
+                                                'message': 'The check that you are trying to remove is not found in the users test list'
+                                            })
+                                        }
+                                    } else {
+                                        callback(500, {
+                                            'message': 'There was a server side error wile deleting check data from user'
+                                        })
+                                    }
+                                })
+                            } else {
+                                callback(500, {
+                                    'message': 'There was a server side error'
+                                })
+                            }
+                        })
+                    } else {
+                        callback(403, {
+                            'message': 'Invalid authentication token'
+                        })
+                    }
+                })
+            } else {
+                callback(500, {
+                    'message': 'There was a server side error, May be the checks are not exist'
+                })
+            }
+        })
+    } else {
+        callback(400, {
+            'message': 'Ivalid data format'
+        })
+    }
 }
 
 module.exports = handler;
