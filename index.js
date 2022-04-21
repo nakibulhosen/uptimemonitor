@@ -1,29 +1,30 @@
 /*
-*Title: Uptime Monitoring Application
-*Description: A RESTFUL API to monitor up or down time user defined links
+*Title: Project Initial file
+*Description: Initial file to start the node server and workers
 *Author: Md Nakibul Hosen Nahid (Origin: learn with Sumit)
 *Date: 19/04/22
 *
 */
 
 // dependencies 
-const http = require('http');
-const environment = require('./helpers/environments');
-const data = require('./lib/data');
+const server = require('./lib/server')
+const workers = require('./lib/workers')
 
 const { handleReqRes } = require('./helpers/handleReqRes')
 // app object - mudule scaffolding 
 const app = {};
 
-// create server 
-app.createServer = () => {
-    const server = http.createServer(app.handleReqRes);
-    server.listen(environment.port, () => {
-        console.log(`Listening to port ${environment.port}`)
-    })
+app.init = () => {
+    //start the server
+    server.init();
+    //start the workers
+    workers.init();
 }
+
+
+
 
 // handle Request and Response 
 app.handleReqRes = handleReqRes;
 
-app.createServer();
+app.init();
