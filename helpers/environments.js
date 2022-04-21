@@ -43,5 +43,4 @@ const currentEnvironment = typeof process.env.NODE_ENV === 'string' ? process.en
 //Export corresponding environment object
 
 const environmentToExport = typeof (environments[currentEnvironment]) === 'object' ? environments[currentEnvironment] : environments.staging;
-
 module.exports = environmentToExport;

@@ -12,7 +12,6 @@ const { parseJSON } = require('../../helpers/utilities')
 const tokenHandler = require('./tokenHandler')
 const { maxChecks } = require('../../helpers/environments')
 
-
 // module scaffolding 
 
 const handler = {}

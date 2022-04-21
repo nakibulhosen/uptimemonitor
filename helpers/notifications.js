@@ -15,7 +15,6 @@ const notifications = {}
 
 //send sms to user using twilio api
 notifications.sendTwilioSms = (phone, msg, callback) => {
-    console.log(twilio)
     const userPhone = typeof (phone) === 'string' && phone.trim().length === 11 ? phone.trim() : false;
     const userMsg = typeof (msg) === 'string' && msg.trim().length <= 1600 ? msg.trim() : false;
     if (userPhone && userMsg) {
